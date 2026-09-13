@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Natalia Fit AI</title>
+  <style>
+    :root {
+      --bg: #fff7fc;
+      --surface: #ffffff;
+      --surface-2: #f7e9ff;
+      --ink: #2a1238;
+      --muted: #84698f;
+      --pink: #f0449b;
+      --pink-soft: #ffd8ef;
+      --pink-glow: #ff8bc8;
+      --purple: #7c3aed;
+      --purple-2: #b45cff;
+      --purple-dark: #42145f;
+      --line: #efdaf4;
+      --success: #7c3aed;
+      --warning: #c8553d;
+      --shadow: 0 28px 58px rgba(124, 58, 237, .22);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 139, 200, .42), transparent 24rem),
+        radial-gradient(circle at 86% 16%, rgba(124, 58, 237, .30), transparent 26rem),
+        radial-gradient(circle at 50% 95%, rgba(255, 216, 239, .70), transparent 20rem),
+        linear-gradient(180deg, #ffffff 0%, #fff0fa 48%, #f4e8ff 100%);
+      color: var(--ink);
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .phone {
+      position: relative;
+      width: min(100%, 430px);
+      height: min(900px, calc(100vh - 32px));
+      min-height: 760px;
+      overflow: hidden;
+      border: 10px solid #ffffff;
+      border-radius: 44px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.80), transparent 28%),
+        var(--bg);
+      box-shadow:
+        0 0 0 1px rgba(124, 58, 237, .14),
+        var(--shadow);
+    }
+
+    .app {
+      height: 100%;
+      overflow-y: auto;
+      padding: 28px 18px 104px;
+      scrollbar-width: none;
+    }
+
+    .app::-webkit-scrollbar { display: none; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 4px 2px 16px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: 38px;
+      line-height: 1.04;
+      letter-spacing: 0;
+      font-weight: 1000;
+    }
+
+    h2 {
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: 0;
+      margin-bottom: 12px;
+      font-weight: 1000;
+    }
+
+    h3 {
+      font-size: 15px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      box-shadow: 0 12px 24px rgba(240, 68, 155, .22);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .88);
+      border: 1px solid rgba(124, 58, 237, .13);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(124, 58, 237, .10);
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 14px;
+      padding: 16px;
+      align-items: center;
+    }
+
+    .ring {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--pink) 0 40%, var(--purple) 40% 63%, #f2e1f7 63% 100%);
+      position: relative;
+    }
+
+    .ring::after {
+      content: "";
+      width: 98px;
+      height: 98px;
+      border-radius: 50%;
+      position: absolute;
+      background: linear-gradient(180deg, #fff, #fff6fc);
+      box-shadow: inset 0 0 0 1px rgba(124, 58, 237, .08);
+    }
+
+    .ring-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .ring strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .ring span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mini-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .pill {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: linear-gradient(135deg, #ffe2f3, #efe5ff);
+      color: var(--purple-dark);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .section {
+      margin-top: 18px;
+    }
+
+    .macro-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .macro {
+      padding: 12px;
+    }
+
+    .macro-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .macro-top span:last-child {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #f1def3;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--pink), var(--purple-2), var(--purple));
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quick {
+      min-height: 78px;
+      padding: 13px;
+      text-align: left;
+    }
+
+    .quick span {
+      color: var(--muted);
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .primary {
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: #fff;
+      font-weight: 950;
+      box-shadow: 0 14px 28px rgba(240, 68, 155, .28);
+    }
+
+    .secondary {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(124, 58, 237, .17);
+      background: rgba(255, 255, 255, .82);
+      color: var(--purple-dark);
+      font-weight: 900;
+    }
+
+    .feedback {
+      padding: 14px;
+      background: linear-gradient(135deg, #fff, #ffe5f4 46%, #f1e6ff);
+      border-color: rgba(240, 68, 155, .20);
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .feedback span {
+      color: var(--pink);
+    }
+
+    .tabs {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 9px;
+      border-radius: 26px;
+      border: 1px solid rgba(124, 58, 237, .13);
+      background: rgba(255, 255, 255, .90);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 10px 24px rgba(124, 58, 237, .18);
+    }
+
+    .tab {
+      min-height: 52px;
+      border-radius: 20px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      box-shadow: 0 10px 22px rgba(240, 68, 155, .20);
+    }
+
+    .screen {
+      display: none;
+      animation: fade .18s ease-out;
+    }
+
+    .screen.active { display: block; }
+
+    @keyframes fade {
+      from { opacity: .55; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .camera-shell {
+      min-height: 420px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 78% 22%, rgba(255, 255, 255, .86) 0 18%, transparent 19%),
+        radial-gradient(circle at 72% 30%, rgba(255, 139, 200, .84) 0 11%, transparent 12%),
+        radial-gradient(circle at 24% 76%, rgba(124, 58, 237, .58) 0 18%, transparent 19%),
+        linear-gradient(135deg, rgba(255, 216, 239, .92), rgba(180, 92, 255, .74)),
+        linear-gradient(45deg, #fff7fc, #f4e8ff);
+    }
+
+    video, canvas {
+      width: 100%;
+      min-height: 420px;
+      object-fit: cover;
+      display: block;
+      background: #241032;
+    }
+
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px;
+      color: #fff;
+      pointer-events: none;
+    }
+
+    .camera-actions {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .capture {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 7px solid rgba(255, 255, 255, .72);
+      background: #fff;
+      box-shadow: 0 8px 26px rgba(0,0,0,.28);
+    }
+
+    .file-label {
+      min-height: 44px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, .18);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      backdrop-filter: blur(10px);
+    }
+
+    .file-label input {
+      display: none;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .chip {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .90);
+      color: var(--purple-dark);
+      border: 1px solid rgba(124, 58, 237, .16);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .chip.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: #fff;
+    }
+
+    .analysis {
+      display: grid;
+      gap: 12px;
+    }
+
+    .meal-total {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tiny-stat {
+      min-height: 72px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .tiny-stat strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .tiny-stat span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .food-row, .exercise-row, .progress-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .food-row p, .exercise-row p, .progress-row p {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+      line-height: 1.35;
+      margin-bottom: 0;
+    }
+
+    .confidence {
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stepper button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      color: var(--purple);
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .stepper-value {
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-weight: 950;
+    }
+
+    .plan-card {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .plan-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffe5f4, #efe5ff);
+      color: var(--purple-dark);
+      font-size: 11px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .exercise-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .swap {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--purple);
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .graph {
+      height: 138px;
+      padding: 14px 10px 10px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+    }
+
+    .bar {
+      flex: 1;
+      min-width: 0;
+      border-radius: 999px 999px 4px 4px;
+      background: linear-gradient(180deg, var(--pink-glow), var(--pink), var(--purple));
+    }
+
+    .bottom-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .toast {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      top: 18px;
+      z-index: 5;
+      transform: translateY(-130%);
+      transition: transform .24s ease;
+      padding: 13px 14px;
+      color: #fff;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--purple-dark), var(--pink));
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 16px 30px rgba(36, 16, 50, .22);
+    }
+
+    .toast.show { transform: translateY(0); }
+
+    @media (min-width: 860px) {
+      .page {
+        grid-template-columns: 430px minmax(300px, 420px);
+        gap: 34px;
+      }
+
+      .desktop-notes {
+        display: block;
+      }
+    }
+
+    @media (max-width: 859px) {
+      .page {
+        padding: 0;
+      }
+
+      .phone {
+        width: 100%;
+        height: 100vh;
+        min-height: 100vh;
+        border-radius: 0;
+        border: 0;
+      }
+
+      .desktop-notes {
+        display: none;
+      }
+    }
+
+    .desktop-notes {
+      color: var(--ink);
+    }
+
+    .desktop-notes .note {
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .desktop-notes p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="phone" aria-label="Prototipo mobile Natalia Fit AI">
+      <div class="toast" id="toast">Comida guardada. Hoy faltan 42 g de proteina.</div>
+      <div class="app">
+        <section class="screen active" id="screen-home">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Hoy, Natalia</p>
+              <h1>Vas en buen ritmo</h1>
+            </div>
+            <div class="avatar" aria-hidden="true">N</div>
+          </header>
+
+          <article class="card hero-card">
+            <div class="ring" aria-label="63 por ciento de calorias usadas">
+              <div class="ring-content">
+                <strong id="remainingKcal">574</strong>
+                <span>kcal libres</span>
+              </div>
+            </div>
+            <div class="mini-stack">
+              <div class="stat-row">
+                <span>Objetivo</span>
+                <span class="pill">1537 kcal</span>
+              </div>
+              <div class="stat-row">
+                <span>Comidas</span>
+                <span>2 registradas</span>
+              </div>
+              <div class="stat-row">
+                <span>Entreno</span>
+                <span>Dia B</span>
+              </div>
+              <button class="primary" data-goto="camera">Foto comida</button>
+            </div>
+          </article>
+
+          <section class="section">
+            <h2>Macros</h2>
+            <div class="macro-list">
+              <article class="card macro">
+                <div class="macro-top"><span>Proteina</span><span id="proteinText">99 / 141 g</span></div>
+                <div class="track"><div class="fill" id="proteinFill" style="width:70%"></div></div>
+              </article>
+              <article class="card macro">
+                <div class="macro-top"><span>Carbohidratos</span><span id="carbsText">102 / 147 g</span></div>
+                <div class="track"><div class="fill" id="carbsFill" style="width:69%"></div></div>
+              </article>
+              <article class="card macro">
+                <div class="macro-top"><span>Grasas</span><span id="fatText">31 / 43 g</span></div>
+                <div class="track"><div class="fill" id="fatFill" style="width:72%"></div></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="section">
+            <article class="card feedback"><span>Ahora:</span> prioriza proteina en la siguiente comida y deja grasas ligeras para la cena.</article>
+          </section>
+
+          <section class="section">
+            <h2>Rapido</h2>
+            <div class="quick-grid">
+              <button class="card quick" data-goto="nutrition"><strong>Diario</strong><span>Ver comidas</span></button>
+              <button class="card quick" data-goto="training"><strong>Entreno</strong><span>42 min lumbar-safe</span></button>
+              <button class="card quick" id="frequentMeal"><strong>Yogur proteico</strong><span>Comida frecuente</span></button>
+              <button class="card quick" data-goto="progress"><strong>Peso</strong><span>Media semanal</span></button>
+            </div>
+          </section>
+        </section>
+
+        <section class="screen" id="screen-camera">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Nutricion</p>
+              <h1>Foto comida</h1>
+            </div>
+            <button class="secondary" data-goto="home">Cerrar</button>
+          </header>
+
+          <div class="chips" aria-label="Tipo de comida">
+            <button class="chip">Desayuno</button>
+            <button class="chip active">Comida</button>
+            <button class="chip">Cena</button>
+            <button class="chip">Snack</button>
+          </div>
+
+          <section class="section card camera-shell">
+            <video id="cameraVideo" autoplay playsinline muted></video>
+            <canvas id="snapshotCanvas" hidden></canvas>
+            <div class="camera-overlay">
+              <div>
+                <span class="pill">IA editable</span>
+              </div>
+              <div class="camera-actions">
+                <label class="file-label">
+                  Galeria
+                  <input id="fileInput" type="file" accept="image/*" capture="environment">
+                </label>
+                <button class="capture" id="captureButton" aria-label="Capturar comida"></button>
+                <button class="file-label" id="mockPhoto">Demo</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <article class="card feedback">Permiso de camara solo al tocar. En Vercel funcionara con HTTPS; en local, con localhost.</article>
+          </section>
+        </section>
+
+        <section class="screen" id="screen-analysis">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Analisis IA</p>
+              <h1>Revisa y guarda</h1>
+            </div>
+            <button class="secondary" data-goto="camera">Repetir</button>
+          </header>
+
+          <div class="analysis">
+            <article class="card feedback"><span>Estimacion:</span> pollo, arroz y aguacate. Puedes ajustar la racion antes de guardar.</article>
+
+            <div class="meal-total">
+              <article class="card tiny-stat"><strong id="mealKcal">486</strong><span>kcal</span></article>
+              <article class="card tiny-stat"><strong id="mealProtein">43</strong><span>prot</span></article>
+              <article class="card tiny-stat"><strong id="mealCarbs">51</strong><span>carb</span></article>
+              <article class="card tiny-stat"><strong id="mealFat">14</strong><span>grasas</span></article>
+            </div>
+
+            <article class="card food-row">
+              <div>
+                <h3>Pechuga de pollo</h3>
+                <p>150 g estimados</p>
+              </div>
+              <span class="confidence">92%</span>
+            </article>
+
+            <article class="card food-row">
+              <div>
+                <h3>Arroz cocido</h3>
+                <p>160 g estimados</p>
+              </div>
+              <span class="confidence">84%</span>
+            </article>
+
+            <article class="card food-row">
+              <div>
+                <h3>Aguacate</h3>
+                <p>40 g estimados</p>
+              </div>
+              <span class="confidence">77%</span>
+            </article>
+
+            <article class="card macro">
+              <div class="macro-top"><span>Racion total</span><span id="portionLabel">normal</span></div>
+              <div class="stepper">
+                <button id="decreasePortion" aria-label="Reducir racion">-</button>
+                <div class="stepper-value" id="portionValue">1.0x</div>
+                <button id="increasePortion" aria-label="Aumentar racion">+</button>
+              </div>
+            </article>
+          </div>
+
+          <div class="bottom-actions">
+            <button class="secondary" id="saveFrequent">Frecuente</button>
+            <button class="primary" id="confirmMeal">Guardar</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-nutrition">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Diario</p>
+              <h1>Nutricion</h1>
+            </div>
+            <button class="primary" data-goto="camera">Foto</button>
+          </header>
+
+          <section class="section">
+            <h2>Comidas de hoy</h2>
+            <div class="analysis">
+              <article class="card food-row">
+                <div><h3>Desayuno frecuente</h3><p>Yogur proteico, frutos rojos, avena</p></div>
+                <span class="pill">342 kcal</span>
+              </article>
+              <article class="card food-row">
+                <div><h3>Comida IA</h3><p>Pollo, arroz, aguacate. Ajustada a 1.0x</p></div>
+                <span class="pill">486 kcal</span>
+              </article>
+              <article class="card food-row">
+                <div><h3>Cena sugerida</h3><p>Alta en proteina, baja en grasa</p></div>
+                <span class="pill">Pendiente</span>
+              </article>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2>Aprendizaje</h2>
+            <div class="chips">
+              <button class="chip active">Yogur proteico</button>
+              <button class="chip">Tortilla claras</button>
+              <button class="chip">Pollo arroz</button>
+            </div>
+          </section>
+        </section>
+
+        <section class="screen" id="screen-training">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Semana 3</p>
+              <h1>Entreno Dia B</h1>
+            </div>
+            <span class="pill">42 min</span>
+          </header>
+
+          <article class="card plan-card">
+            <div class="plan-top">
+              <div>
+                <h2>Tiron + gluteo</h2>
+                <p class="eyebrow">Sin sobrecarga lumbar</p>
+              </div>
+              <span class="tag">RPE 7</span>
+            </div>
+            <div class="exercise-list">
+              <article class="card exercise-row">
+                <div><h3>Jalon en polea</h3><p>3 x 10-12 · 75 s</p></div>
+                <button class="swap">Cambiar</button>
+              </article>
+              <article class="card exercise-row">
+                <div><h3>Remo con pecho apoyado</h3><p>3 x 10 · espalda estable</p></div>
+                <button class="swap">Molesta</button>
+              </article>
+              <article class="card exercise-row">
+                <div><h3>Hip thrust controlado</h3><p>3 x 8-10 · pausa arriba</p></div>
+                <button class="swap">Molesta</button>
+              </article>
+              <article class="card exercise-row">
+                <div><h3>Pallof press</h3><p>3 x 12/lado · anti-rotacion</p></div>
+                <button class="swap">Cambiar</button>
+              </article>
+            </div>
+          </article>
+
+          <section class="section">
+            <article class="card feedback"><span>Regla lumbar:</span> si el dolor pasa de 3/10, baja carga o cambia a alternativa con mas soporte.</article>
+          </section>
+
+          <div class="bottom-actions">
+            <button class="secondary" id="swapDemo">Alternativa</button>
+            <button class="primary" id="finishWorkout">Completar</button>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-progress">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Progreso</p>
+              <h1>Tendencia semanal</h1>
+            </div>
+            <span class="pill">64.0 kg</span>
+          </header>
+
+          <article class="card graph" aria-label="Grafica simple de peso semanal">
+            <div class="bar" style="height:82%"></div>
+            <div class="bar" style="height:76%"></div>
+            <div class="bar" style="height:78%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:68%"></div>
+            <div class="bar" style="height:64%"></div>
+            <div class="bar" style="height:61%"></div>
+          </article>
+
+          <section class="section analysis">
+            <article class="card progress-row">
+              <div><h3>Media semanal</h3><p>Menos ruido que el peso diario</p></div>
+              <span class="pill">-0.3 kg</span>
+            </article>
+            <article class="card progress-row">
+              <div><h3>Adherencia macros</h3><p>Proteina cumplida 5 de 7 dias</p></div>
+              <span class="pill">82%</span>
+            </article>
+            <article class="card progress-row">
+              <div><h3>Entrenos</h3><p>2 completados, 1 pendiente</p></div>
+              <span class="pill">2/3</span>
+            </article>
+          </section>
+
+          <section class="section">
+            <article class="card feedback"><span>Lectura:</span> buena consistencia. Esta semana el foco es cerrar proteina antes de la cena.</article>
+          </section>
+        </section>
+      </div>
+
+      <nav class="tabs" aria-label="Navegacion principal">
+        <button class="tab active" data-goto="home">Hoy</button>
+        <button class="tab" data-goto="nutrition">Nutricion</button>
+        <button class="tab" data-goto="training">Entreno</button>
+        <button class="tab" data-goto="progress">Progreso</button>
+      </nav>
+    </section>
+
+    <aside class="desktop-notes">
+      <article class="card note">
+        <h2>Arquitectura</h2>
+        <p>Mobile-first con navegacion inferior, accion principal de camara y pantallas compactas. En desktop se mantiene el formato app para validar el uso real en iPhone.</p>
+      </article>
+      <article class="card note">
+        <h2>IA y correccion</h2>
+        <p>La estimacion de comida es editable por racion, alimentos y macros. Las correcciones alimentan comidas frecuentes para reducir friccion con el tiempo.</p>
+      </article>
+      <article class="card note">
+        <h2>Lumbar-safe</h2>
+        <p>Las rutinas priorizan maquinas, soporte, core anti-rotacion y alternativas por molestia. El objetivo es continuidad sin castigar la espalda.</p>
+      </article>
+    </aside>
+  </main>
+
+  <script>
+    const screens = [...document.querySelectorAll(".screen")];
+    const tabs = [...document.querySelectorAll(".tab")];
+    const toast = document.getElementById("toast");
+    const video = document.getElementById("cameraVideo");
+    const canvas = document.getElementById("snapshotCanvas");
+    const baseMeal = { kcal: 486, protein: 43, carbs: 51, fat: 14 };
+    let portion = 1;
+    let stream = null;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 2300);
+    }
+
+    function gotoScreen(name) {
+      screens.forEach((screen) => screen.classList.toggle("active", screen.id === `screen-${name}`));
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.goto === name));
+      if (name === "camera") startCamera();
+      if (name !== "camera") stopCamera();
+      document.querySelector(".app").scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast("Camara no disponible. Usa galeria.");
+        return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        video.srcObject = stream;
+      } catch (error) {
+        showToast("Permiso de camara bloqueado. Usa galeria.");
+      }
+    }
+
+    function stopCamera() {
+      if (!stream) return;
+      stream.getTracks().forEach((track) => track.stop());
+      stream = null;
+      video.srcObject = null;
+    }
+
+    function captureAndAnalyze() {
+      if (video.videoWidth) {
+        canvas.hidden = false;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+      }
+      showToast("Analizando comida con IA...");
+      window.setTimeout(() => gotoScreen("analysis"), 650);
+    }
+
+    function updateMeal() {
+      const kcal = Math.round(baseMeal.kcal * portion);
+      const protein = Math.round(baseMeal.protein * portion);
+      const carbs = Math.round(baseMeal.carbs * portion);
+      const fat = Math.round(baseMeal.fat * portion);
+      document.getElementById("mealKcal").textContent = kcal;
+      document.getElementById("mealProtein").textContent = protein;
+      document.getElementById("mealCarbs").textContent = carbs;
+      document.getElementById("mealFat").textContent = fat;
+      document.getElementById("portionValue").textContent = `${portion.toFixed(1)}x`;
+      document.getElementById("portionLabel").textContent = portion < .9 ? "pequena" : portion > 1.1 ? "grande" : "normal";
+    }
+
+    function saveMeal() {
+      const kcal = Math.round(baseMeal.kcal * portion);
+      document.getElementById("remainingKcal").textContent = Math.max(0, 574 - kcal + 486);
+      document.getElementById("proteinText").textContent = "141 / 141 g";
+      document.getElementById("proteinFill").style.width = "100%";
+      document.getElementById("carbsText").textContent = "147 / 147 g";
+      document.getElementById("carbsFill").style.width = "100%";
+      document.getElementById("fatText").textContent = "43 / 43 g";
+      document.getElementById("fatFill").style.width = "100%";
+      gotoScreen("home");
+      showToast("Comida guardada. Proteina del dia cubierta.");
+    }
+
+    document.querySelectorAll("[data-goto]").forEach((button) => {
+      button.addEventListener("click", () => gotoScreen(button.dataset.goto));
+    });
+
+    document.getElementById("captureButton").addEventListener("click", captureAndAnalyze);
+    document.getElementById("mockPhoto").addEventListener("click", captureAndAnalyze);
+    document.getElementById("fileInput").addEventListener("change", captureAndAnalyze);
+    document.getElementById("increasePortion").addEventListener("click", () => {
+      portion = Math.min(1.6, +(portion + .1).toFixed(1));
+      updateMeal();
+    });
+    document.getElementById("decreasePortion").addEventListener("click", () => {
+      portion = Math.max(.6, +(portion - .1).toFixed(1));
+      updateMeal();
+    });
+    document.getElementById("confirmMeal").addEventListener("click", saveMeal);
+    document.getElementById("saveFrequent").addEventListener("click", () => showToast("Guardada como comida frecuente."));
+    document.getElementById("frequentMeal").addEventListener("click", () => showToast("Yogur proteico sumado al diario."));
+    document.getElementById("finishWorkout").addEventListener("click", () => showToast("Entreno completado. Semana 2 de 3."));
+    document.getElementById("swapDemo").addEventListener("click", () => showToast("Alternativa: remo sentado con soporte."));
+  </script>
+</body>
+</html>
