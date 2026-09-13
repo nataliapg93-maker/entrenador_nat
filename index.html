@@ -86,6 +86,27 @@
       padding: 4px 2px 16px;
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .icon-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(124, 58, 237, .18);
+      background: rgba(255, 255, 255, .84);
+      color: var(--purple-dark);
+      font-size: 20px;
+      font-weight: 1000;
+      box-shadow: 0 8px 18px rgba(124, 58, 237, .10);
+    }
+
     .eyebrow {
       margin: 0 0 4px;
       color: var(--muted);
@@ -476,6 +497,31 @@
       padding: 12px;
     }
 
+    .meal-row {
+      grid-template-columns: 58px 1fr auto;
+    }
+
+    .meal-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: #fff;
+      font-weight: 1000;
+      background:
+        radial-gradient(circle at 70% 24%, rgba(255,255,255,.84) 0 18%, transparent 19%),
+        linear-gradient(135deg, var(--pink-glow), var(--purple));
+    }
+
+    .meal-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .food-row p, .exercise-row p, .progress-row p {
       color: var(--muted);
       font-size: 12px;
@@ -488,6 +534,60 @@
       color: var(--success);
       font-size: 12px;
       font-weight: 950;
+    }
+
+    .empty-state {
+      min-height: 132px;
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .empty-state p {
+      max-width: 250px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      line-height: 1.4;
+      font-weight: 760;
+    }
+
+    .edit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      padding: 0 12px;
+      outline: 0;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .field input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, .13);
     }
 
     .stepper {
@@ -547,6 +647,67 @@
     .exercise-list {
       display: grid;
       gap: 10px;
+    }
+
+    .exercise-media {
+      min-height: 164px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 72% 30%, rgba(255, 255, 255, .82) 0 12%, transparent 13%),
+        radial-gradient(circle at 28% 68%, rgba(255, 139, 200, .64) 0 18%, transparent 19%),
+        linear-gradient(135deg, #f0449b, #7c3aed);
+    }
+
+    .exercise-media::before,
+    .exercise-media::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .76);
+      transform-origin: center;
+    }
+
+    .exercise-media::before {
+      width: 72px;
+      height: 16px;
+      left: 44%;
+      top: 48%;
+      transform: rotate(-22deg);
+    }
+
+    .exercise-media::after {
+      width: 16px;
+      height: 92px;
+      left: 52%;
+      top: 27%;
+      transform: rotate(18deg);
+    }
+
+    .play-badge {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      background: rgba(66, 20, 95, .76);
+      backdrop-filter: blur(10px);
+      font-size: 12px;
+      font-weight: 1000;
+    }
+
+    .play-badge::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 9px solid #fff;
     }
 
     .swap {
@@ -653,21 +814,21 @@
 <body>
   <main class="page">
     <section class="phone" aria-label="Prototipo mobile Natalia Fit AI">
-      <div class="toast" id="toast">Comida guardada. Hoy faltan 42 g de proteina.</div>
+      <div class="toast" id="toast">Listo.</div>
       <div class="app">
         <section class="screen active" id="screen-home">
           <header class="topbar">
             <div>
               <p class="eyebrow">Hoy, Natalia</p>
-              <h1>Vas en buen ritmo</h1>
+              <h1>Empieza hoy</h1>
             </div>
             <div class="avatar" aria-hidden="true">N</div>
           </header>
 
           <article class="card hero-card">
-            <div class="ring" aria-label="63 por ciento de calorias usadas">
+            <div class="ring" id="calorieRing" aria-label="0 por ciento de calorias usadas">
               <div class="ring-content">
-                <strong id="remainingKcal">574</strong>
+                <strong id="remainingKcal">1537</strong>
                 <span>kcal libres</span>
               </div>
             </div>
@@ -678,11 +839,11 @@
               </div>
               <div class="stat-row">
                 <span>Comidas</span>
-                <span>2 registradas</span>
+                <span id="mealCountText">0 registradas</span>
               </div>
               <div class="stat-row">
                 <span>Entreno</span>
-                <span>Dia B</span>
+                <span id="todayWorkoutText">Pendiente</span>
               </div>
               <button class="primary" data-goto="camera">Foto comida</button>
             </div>
@@ -692,31 +853,31 @@
             <h2>Macros</h2>
             <div class="macro-list">
               <article class="card macro">
-                <div class="macro-top"><span>Proteina</span><span id="proteinText">99 / 141 g</span></div>
-                <div class="track"><div class="fill" id="proteinFill" style="width:70%"></div></div>
+                <div class="macro-top"><span>Proteina</span><span id="proteinText">0 / 141 g</span></div>
+                <div class="track"><div class="fill" id="proteinFill" style="width:0%"></div></div>
               </article>
               <article class="card macro">
-                <div class="macro-top"><span>Carbohidratos</span><span id="carbsText">102 / 147 g</span></div>
-                <div class="track"><div class="fill" id="carbsFill" style="width:69%"></div></div>
+                <div class="macro-top"><span>Carbohidratos</span><span id="carbsText">0 / 147 g</span></div>
+                <div class="track"><div class="fill" id="carbsFill" style="width:0%"></div></div>
               </article>
               <article class="card macro">
-                <div class="macro-top"><span>Grasas</span><span id="fatText">31 / 43 g</span></div>
-                <div class="track"><div class="fill" id="fatFill" style="width:72%"></div></div>
+                <div class="macro-top"><span>Grasas</span><span id="fatText">0 / 43 g</span></div>
+                <div class="track"><div class="fill" id="fatFill" style="width:0%"></div></div>
               </article>
             </div>
           </section>
 
           <section class="section">
-            <article class="card feedback"><span>Ahora:</span> prioriza proteina en la siguiente comida y deja grasas ligeras para la cena.</article>
+            <article class="card feedback" id="dailyFeedback"><span>Ahora:</span> registra tu primera comida cuando la tengas. La app empieza a aprender desde la primera foto.</article>
           </section>
 
           <section class="section">
             <h2>Rapido</h2>
             <div class="quick-grid">
               <button class="card quick" data-goto="nutrition"><strong>Diario</strong><span>Ver comidas</span></button>
-              <button class="card quick" data-goto="training"><strong>Entreno</strong><span>42 min lumbar-safe</span></button>
-              <button class="card quick" id="frequentMeal"><strong>Yogur proteico</strong><span>Comida frecuente</span></button>
-              <button class="card quick" data-goto="progress"><strong>Peso</strong><span>Media semanal</span></button>
+              <button class="card quick" data-goto="training"><strong>Entreno</strong><span>Ver rutina segura</span></button>
+              <button class="card quick" data-goto="camera"><strong>Comida libre</strong><span>Cualquier hora</span></button>
+              <button class="card quick" data-goto="progress"><strong>Progreso</strong><span>Sin datos aun</span></button>
             </div>
           </section>
         </section>
@@ -727,14 +888,17 @@
               <p class="eyebrow">Nutricion</p>
               <h1>Foto comida</h1>
             </div>
-            <button class="secondary" data-goto="home">Cerrar</button>
+            <div class="top-actions">
+              <button class="icon-button" data-goto="home" aria-label="Ir al menu principal">⌂</button>
+            </div>
           </header>
 
           <div class="chips" aria-label="Tipo de comida">
-            <button class="chip">Desayuno</button>
-            <button class="chip active">Comida</button>
-            <button class="chip">Cena</button>
-            <button class="chip">Snack</button>
+            <button class="chip active" data-meal-kind="Comida de ahora">Ahora</button>
+            <button class="chip" data-meal-kind="Desayuno">Desayuno</button>
+            <button class="chip" data-meal-kind="Almuerzo">Almuerzo</button>
+            <button class="chip" data-meal-kind="Cena">Cena</button>
+            <button class="chip" data-meal-kind="Snack">Snack</button>
           </div>
 
           <section class="section card camera-shell">
@@ -756,7 +920,7 @@
           </section>
 
           <section class="section">
-            <article class="card feedback">Permiso de camara solo al tocar. En Vercel funcionara con HTTPS; en local, con localhost.</article>
+            <article class="card feedback">Puedes subir una foto de cualquier comida a cualquier hora. En Vercel la camara funcionara con HTTPS.</article>
           </section>
         </section>
 
@@ -766,11 +930,14 @@
               <p class="eyebrow">Analisis IA</p>
               <h1>Revisa y guarda</h1>
             </div>
-            <button class="secondary" data-goto="camera">Repetir</button>
+            <div class="top-actions">
+              <button class="icon-button" data-goto="home" aria-label="Ir al menu principal">⌂</button>
+              <button class="secondary" data-goto="camera">Foto</button>
+            </div>
           </header>
 
           <div class="analysis">
-            <article class="card feedback"><span>Estimacion:</span> pollo, arroz y aguacate. Puedes ajustar la racion antes de guardar.</article>
+            <article class="card feedback" id="analysisFeedback"><span>Estimacion:</span> revisa la comida, ajusta cantidades y guarda.</article>
 
             <div class="meal-total">
               <article class="card tiny-stat"><strong id="mealKcal">486</strong><span>kcal</span></article>
@@ -811,6 +978,32 @@
                 <button id="increasePortion" aria-label="Aumentar racion">+</button>
               </div>
             </article>
+
+            <article class="card macro">
+              <div class="macro-top"><span>Modificar comida</span><span>editable</span></div>
+              <div class="edit-grid">
+                <div class="field full">
+                  <label for="mealNameInput">Nombre</label>
+                  <input id="mealNameInput" type="text" value="Comida de ahora">
+                </div>
+                <div class="field">
+                  <label for="mealKcalInput">Kcal</label>
+                  <input id="mealKcalInput" type="number" min="0" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="mealProteinInput">Proteina</label>
+                  <input id="mealProteinInput" type="number" min="0" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="mealCarbsInput">Carbos</label>
+                  <input id="mealCarbsInput" type="number" min="0" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="mealFatInput">Grasas</label>
+                  <input id="mealFatInput" type="number" min="0" inputmode="numeric">
+                </div>
+              </div>
+            </article>
           </div>
 
           <div class="bottom-actions">
@@ -825,23 +1018,20 @@
               <p class="eyebrow">Diario</p>
               <h1>Nutricion</h1>
             </div>
-            <button class="primary" data-goto="camera">Foto</button>
+            <div class="top-actions">
+              <button class="icon-button" data-goto="home" aria-label="Ir al menu principal">⌂</button>
+              <button class="primary" data-goto="camera">Foto</button>
+            </div>
           </header>
 
           <section class="section">
             <h2>Comidas de hoy</h2>
-            <div class="analysis">
-              <article class="card food-row">
-                <div><h3>Desayuno frecuente</h3><p>Yogur proteico, frutos rojos, avena</p></div>
-                <span class="pill">342 kcal</span>
-              </article>
-              <article class="card food-row">
-                <div><h3>Comida IA</h3><p>Pollo, arroz, aguacate. Ajustada a 1.0x</p></div>
-                <span class="pill">486 kcal</span>
-              </article>
-              <article class="card food-row">
-                <div><h3>Cena sugerida</h3><p>Alta en proteina, baja en grasa</p></div>
-                <span class="pill">Pendiente</span>
+            <div class="analysis" id="mealList">
+              <article class="card empty-state">
+                <div>
+                  <p>Aun no hay comidas registradas. Sube una foto cuando quieras empezar.</p>
+                  <button class="primary" data-goto="camera">Subir comida</button>
+                </div>
               </article>
             </div>
           </section>
@@ -849,9 +1039,8 @@
           <section class="section">
             <h2>Aprendizaje</h2>
             <div class="chips">
-              <button class="chip active">Yogur proteico</button>
-              <button class="chip">Tortilla claras</button>
-              <button class="chip">Pollo arroz</button>
+              <button class="chip active">Sin frecuentes</button>
+              <button class="chip" data-goto="camera">Crear con foto</button>
             </div>
           </section>
         </section>
@@ -859,36 +1048,42 @@
         <section class="screen" id="screen-training">
           <header class="topbar">
             <div>
-              <p class="eyebrow">Semana 3</p>
-              <h1>Entreno Dia B</h1>
+              <p class="eyebrow">Plan inicial</p>
+              <h1>Entreno Dia A</h1>
             </div>
-            <span class="pill">42 min</span>
+            <div class="top-actions">
+              <button class="icon-button" data-goto="home" aria-label="Ir al menu principal">⌂</button>
+              <span class="pill">42 min</span>
+            </div>
           </header>
 
           <article class="card plan-card">
+            <div class="card exercise-media" id="exerciseMedia" role="img" aria-label="Vista visual del ejercicio propuesto">
+              <span class="play-badge" id="exerciseMediaLabel">Prensa inclinada</span>
+            </div>
             <div class="plan-top">
               <div>
-                <h2>Tiron + gluteo</h2>
+                <h2>Full body seguro</h2>
                 <p class="eyebrow">Sin sobrecarga lumbar</p>
               </div>
               <span class="tag">RPE 7</span>
             </div>
             <div class="exercise-list">
               <article class="card exercise-row">
-                <div><h3>Jalon en polea</h3><p>3 x 10-12 · 75 s</p></div>
-                <button class="swap">Cambiar</button>
+                <div><h3>Prensa inclinada</h3><p>3 x 10-12 · espalda apoyada</p></div>
+                <button class="swap" data-video="Prensa inclinada">Ver</button>
               </article>
               <article class="card exercise-row">
                 <div><h3>Remo con pecho apoyado</h3><p>3 x 10 · espalda estable</p></div>
-                <button class="swap">Molesta</button>
+                <button class="swap" data-video="Remo con pecho apoyado">Ver</button>
               </article>
               <article class="card exercise-row">
                 <div><h3>Hip thrust controlado</h3><p>3 x 8-10 · pausa arriba</p></div>
-                <button class="swap">Molesta</button>
+                <button class="swap" data-video="Hip thrust controlado">Ver</button>
               </article>
               <article class="card exercise-row">
                 <div><h3>Pallof press</h3><p>3 x 12/lado · anti-rotacion</p></div>
-                <button class="swap">Cambiar</button>
+                <button class="swap" data-video="Pallof press">Ver</button>
               </article>
             </div>
           </article>
@@ -907,38 +1102,41 @@
           <header class="topbar">
             <div>
               <p class="eyebrow">Progreso</p>
-              <h1>Tendencia semanal</h1>
+              <h1>Empieza a medir</h1>
             </div>
-            <span class="pill">64.0 kg</span>
+            <div class="top-actions">
+              <button class="icon-button" data-goto="home" aria-label="Ir al menu principal">⌂</button>
+              <span class="pill">0 datos</span>
+            </div>
           </header>
 
           <article class="card graph" aria-label="Grafica simple de peso semanal">
-            <div class="bar" style="height:82%"></div>
-            <div class="bar" style="height:76%"></div>
-            <div class="bar" style="height:78%"></div>
-            <div class="bar" style="height:70%"></div>
-            <div class="bar" style="height:68%"></div>
-            <div class="bar" style="height:64%"></div>
-            <div class="bar" style="height:61%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
+            <div class="bar" style="height:8%"></div>
           </article>
 
           <section class="section analysis">
             <article class="card progress-row">
-              <div><h3>Media semanal</h3><p>Menos ruido que el peso diario</p></div>
-              <span class="pill">-0.3 kg</span>
+              <div><h3>Media semanal</h3><p>Introduce peso para calcular tendencia</p></div>
+              <span class="pill">0 kg</span>
             </article>
             <article class="card progress-row">
-              <div><h3>Adherencia macros</h3><p>Proteina cumplida 5 de 7 dias</p></div>
-              <span class="pill">82%</span>
+              <div><h3>Adherencia macros</h3><p>Sin comidas registradas todavia</p></div>
+              <span class="pill">0%</span>
             </article>
             <article class="card progress-row">
-              <div><h3>Entrenos</h3><p>2 completados, 1 pendiente</p></div>
-              <span class="pill">2/3</span>
+              <div><h3>Entrenos</h3><p>Marca el primer entreno al terminar</p></div>
+              <span class="pill" id="workoutsDoneText">0/3</span>
             </article>
           </section>
 
           <section class="section">
-            <article class="card feedback"><span>Lectura:</span> buena consistencia. Esta semana el foco es cerrar proteina antes de la cena.</article>
+            <article class="card feedback"><span>Lectura:</span> empieza con una comida y un entreno. La app mostrara tendencia cuando tenga datos.</article>
           </section>
         </section>
       </div>
@@ -973,9 +1171,20 @@
     const toast = document.getElementById("toast");
     const video = document.getElementById("cameraVideo");
     const canvas = document.getElementById("snapshotCanvas");
-    const baseMeal = { kcal: 486, protein: 43, carbs: 51, fat: 14 };
+    const targets = { kcal: 1537, protein: 141, carbs: 147, fat: 43 };
+    const estimates = [
+      { name: "Comida fotografiada", kcal: 430, protein: 34, carbs: 48, fat: 12 },
+      { name: "Plato registrado", kcal: 520, protein: 42, carbs: 55, fat: 16 },
+      { name: "Snack fotografiado", kcal: 260, protein: 24, carbs: 28, fat: 7 }
+    ];
+    let meals = JSON.parse(localStorage.getItem("nataliaMeals") || "[]");
+    let workoutDone = Number(localStorage.getItem("nataliaWorkoutDone") || "0");
+    let baseMeal = estimates[0];
     let portion = 1;
     let stream = null;
+    let editingMealId = null;
+    let selectedMealKind = "Comida de ahora";
+    let selectedPhoto = "";
 
     function showToast(message) {
       toast.textContent = message;
@@ -1011,50 +1220,207 @@
       video.srcObject = null;
     }
 
+    function saveState() {
+      localStorage.setItem("nataliaMeals", JSON.stringify(meals));
+      localStorage.setItem("nataliaWorkoutDone", String(workoutDone));
+    }
+
+    function percent(value, target) {
+      return `${Math.min(100, Math.round((value / target) * 100))}%`;
+    }
+
+    function totals() {
+      return meals.reduce((sum, meal) => ({
+        kcal: sum.kcal + meal.kcal,
+        protein: sum.protein + meal.protein,
+        carbs: sum.carbs + meal.carbs,
+        fat: sum.fat + meal.fat
+      }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+    }
+
+    function renderHome() {
+      const total = totals();
+      const usedPct = Math.min(100, Math.round((total.kcal / targets.kcal) * 100));
+      document.getElementById("remainingKcal").textContent = Math.max(0, targets.kcal - total.kcal);
+      document.getElementById("mealCountText").textContent = `${meals.length} registradas`;
+      document.getElementById("todayWorkoutText").textContent = workoutDone ? "Completado" : "Pendiente";
+      document.getElementById("proteinText").textContent = `${total.protein} / ${targets.protein} g`;
+      document.getElementById("proteinFill").style.width = percent(total.protein, targets.protein);
+      document.getElementById("carbsText").textContent = `${total.carbs} / ${targets.carbs} g`;
+      document.getElementById("carbsFill").style.width = percent(total.carbs, targets.carbs);
+      document.getElementById("fatText").textContent = `${total.fat} / ${targets.fat} g`;
+      document.getElementById("fatFill").style.width = percent(total.fat, targets.fat);
+      document.getElementById("calorieRing").style.background =
+        `conic-gradient(var(--pink) 0 ${Math.min(40, usedPct)}%, var(--purple) ${Math.min(40, usedPct)}% ${usedPct}%, #f2e1f7 ${usedPct}% 100%)`;
+      document.getElementById("workoutsDoneText").textContent = `${workoutDone}/3`;
+
+      const feedback = document.getElementById("dailyFeedback");
+      if (!meals.length) {
+        feedback.innerHTML = "<span>Ahora:</span> registra tu primera comida cuando la tengas. La app empieza a aprender desde la primera foto.";
+      } else if (total.protein < targets.protein) {
+        feedback.innerHTML = `<span>Ahora:</span> faltan ${targets.protein - total.protein} g de proteina. Prioriza una fuente proteica en la proxima comida.`;
+      } else {
+        feedback.innerHTML = "<span>Ahora:</span> proteina cubierta. Mantén el resto del dia ligero y facil de cumplir.";
+      }
+    }
+
+    function renderMeals() {
+      const list = document.getElementById("mealList");
+      if (!meals.length) {
+        list.innerHTML = `
+          <article class="card empty-state">
+            <div>
+              <p>Aun no hay comidas registradas. Sube una foto cuando quieras empezar.</p>
+              <button class="primary" data-goto="camera">Subir comida</button>
+            </div>
+          </article>
+        `;
+      } else {
+        list.innerHTML = meals.map((meal) => `
+          <article class="card food-row meal-row">
+            <div class="meal-thumb">${meal.photo ? `<img src="${meal.photo}" alt="">` : "IA"}</div>
+            <div>
+              <h3>${meal.name}</h3>
+              <p>${meal.time} · ${meal.protein} g prot · ${meal.carbs} g carb · ${meal.fat} g grasas</p>
+            </div>
+            <button class="swap" data-edit-meal="${meal.id}">Editar</button>
+          </article>
+        `).join("");
+      }
+      list.querySelectorAll("[data-goto]").forEach((button) => {
+        button.addEventListener("click", () => gotoScreen(button.dataset.goto));
+      });
+      list.querySelectorAll("[data-edit-meal]").forEach((button) => {
+        button.addEventListener("click", () => editMeal(button.dataset.editMeal));
+      });
+    }
+
+    function syncAll() {
+      renderHome();
+      renderMeals();
+      saveState();
+    }
+
+    function readMealForm() {
+      return {
+        kcal: Math.max(0, Number(document.getElementById("mealKcalInput").value) || 0),
+        protein: Math.max(0, Number(document.getElementById("mealProteinInput").value) || 0),
+        carbs: Math.max(0, Number(document.getElementById("mealCarbsInput").value) || 0),
+        fat: Math.max(0, Number(document.getElementById("mealFatInput").value) || 0)
+      };
+    }
+
+    function setMealForm(values) {
+      document.getElementById("mealKcalInput").value = values.kcal;
+      document.getElementById("mealProteinInput").value = values.protein;
+      document.getElementById("mealCarbsInput").value = values.carbs;
+      document.getElementById("mealFatInput").value = values.fat;
+    }
+
+    function mirrorMealStats(values) {
+      document.getElementById("mealKcal").textContent = values.kcal;
+      document.getElementById("mealProtein").textContent = values.protein;
+      document.getElementById("mealCarbs").textContent = values.carbs;
+      document.getElementById("mealFat").textContent = values.fat;
+    }
+
+    function updateMeal() {
+      const values = {
+        kcal: Math.round(baseMeal.kcal * portion),
+        protein: Math.round(baseMeal.protein * portion),
+        carbs: Math.round(baseMeal.carbs * portion),
+        fat: Math.round(baseMeal.fat * portion)
+      };
+      mirrorMealStats(values);
+      setMealForm(values);
+      document.getElementById("portionValue").textContent = `${portion.toFixed(1)}x`;
+      document.getElementById("portionLabel").textContent = portion < .9 ? "pequena" : portion > 1.1 ? "grande" : "normal";
+    }
+
     function captureAndAnalyze() {
       if (video.videoWidth) {
         canvas.hidden = false;
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext("2d").drawImage(video, 0, 0);
+        selectedPhoto = canvas.toDataURL("image/jpeg", .74);
       }
+      editingMealId = null;
+      baseMeal = { ...estimates[Math.floor(Math.random() * estimates.length)] };
+      portion = 1;
+      document.getElementById("mealNameInput").value = selectedMealKind;
+      document.getElementById("analysisFeedback").innerHTML = `<span>Estimacion:</span> ${selectedMealKind}. Ajusta la comida si la IA no acierta.`;
+      updateMeal();
       showToast("Analizando comida con IA...");
       window.setTimeout(() => gotoScreen("analysis"), 650);
     }
 
-    function updateMeal() {
-      const kcal = Math.round(baseMeal.kcal * portion);
-      const protein = Math.round(baseMeal.protein * portion);
-      const carbs = Math.round(baseMeal.carbs * portion);
-      const fat = Math.round(baseMeal.fat * portion);
-      document.getElementById("mealKcal").textContent = kcal;
-      document.getElementById("mealProtein").textContent = protein;
-      document.getElementById("mealCarbs").textContent = carbs;
-      document.getElementById("mealFat").textContent = fat;
+    function editMeal(id) {
+      const meal = meals.find((item) => item.id === id);
+      if (!meal) return;
+      editingMealId = id;
+      selectedPhoto = meal.photo || "";
+      portion = meal.portion || 1;
+      baseMeal = {
+        kcal: Math.round(meal.kcal / portion),
+        protein: Math.round(meal.protein / portion),
+        carbs: Math.round(meal.carbs / portion),
+        fat: Math.round(meal.fat / portion)
+      };
+      document.getElementById("mealNameInput").value = meal.name;
+      document.getElementById("analysisFeedback").innerHTML = "<span>Modificar:</span> cambia nombre, kcal o macros y guarda los cambios.";
+      setMealForm(meal);
+      mirrorMealStats(meal);
       document.getElementById("portionValue").textContent = `${portion.toFixed(1)}x`;
       document.getElementById("portionLabel").textContent = portion < .9 ? "pequena" : portion > 1.1 ? "grande" : "normal";
+      gotoScreen("analysis");
     }
 
     function saveMeal() {
-      const kcal = Math.round(baseMeal.kcal * portion);
-      document.getElementById("remainingKcal").textContent = Math.max(0, 574 - kcal + 486);
-      document.getElementById("proteinText").textContent = "141 / 141 g";
-      document.getElementById("proteinFill").style.width = "100%";
-      document.getElementById("carbsText").textContent = "147 / 147 g";
-      document.getElementById("carbsFill").style.width = "100%";
-      document.getElementById("fatText").textContent = "43 / 43 g";
-      document.getElementById("fatFill").style.width = "100%";
+      const values = readMealForm();
+      const meal = {
+        id: editingMealId || crypto.randomUUID(),
+        name: document.getElementById("mealNameInput").value.trim() || selectedMealKind,
+        time: new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }),
+        portion,
+        photo: selectedPhoto,
+        ...values
+      };
+      if (editingMealId) {
+        meals = meals.map((item) => item.id === editingMealId ? { ...item, ...meal, time: item.time } : item);
+      } else {
+        meals.unshift(meal);
+      }
+      editingMealId = null;
+      syncAll();
       gotoScreen("home");
-      showToast("Comida guardada. Proteina del dia cubierta.");
+      showToast("Comida guardada y macros actualizados.");
     }
 
     document.querySelectorAll("[data-goto]").forEach((button) => {
       button.addEventListener("click", () => gotoScreen(button.dataset.goto));
     });
 
+    document.querySelectorAll("[data-meal-kind]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        selectedMealKind = chip.dataset.mealKind;
+        document.querySelectorAll("[data-meal-kind]").forEach((item) => item.classList.remove("active"));
+        chip.classList.add("active");
+      });
+    });
+
     document.getElementById("captureButton").addEventListener("click", captureAndAnalyze);
     document.getElementById("mockPhoto").addEventListener("click", captureAndAnalyze);
-    document.getElementById("fileInput").addEventListener("change", captureAndAnalyze);
+    document.getElementById("fileInput").addEventListener("change", (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        selectedPhoto = reader.result;
+        captureAndAnalyze();
+      };
+      reader.readAsDataURL(file);
+    });
     document.getElementById("increasePortion").addEventListener("click", () => {
       portion = Math.min(1.6, +(portion + .1).toFixed(1));
       updateMeal();
@@ -1063,11 +1429,26 @@
       portion = Math.max(.6, +(portion - .1).toFixed(1));
       updateMeal();
     });
+    ["mealKcalInput", "mealProteinInput", "mealCarbsInput", "mealFatInput"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", () => mirrorMealStats(readMealForm()));
+    });
     document.getElementById("confirmMeal").addEventListener("click", saveMeal);
     document.getElementById("saveFrequent").addEventListener("click", () => showToast("Guardada como comida frecuente."));
-    document.getElementById("frequentMeal").addEventListener("click", () => showToast("Yogur proteico sumado al diario."));
-    document.getElementById("finishWorkout").addEventListener("click", () => showToast("Entreno completado. Semana 2 de 3."));
+    document.getElementById("finishWorkout").addEventListener("click", () => {
+      workoutDone = Math.min(3, workoutDone + 1);
+      syncAll();
+      showToast(`Entreno completado. Semana ${workoutDone} de 3.`);
+    });
     document.getElementById("swapDemo").addEventListener("click", () => showToast("Alternativa: remo sentado con soporte."));
+    document.querySelectorAll("[data-video]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const name = button.dataset.video;
+        document.getElementById("exerciseMediaLabel").textContent = name;
+        document.getElementById("exerciseMedia").setAttribute("aria-label", `Video demo de ${name}`);
+        showToast(`Mostrando foto/video de ${name}.`);
+      });
+    });
+    syncAll();
   </script>
 </body>
 </html>
