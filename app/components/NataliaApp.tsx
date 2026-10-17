@@ -292,12 +292,9 @@ export default function NataliaApp() {
       return;
     }
 
-    async function sync() {
-      await migrateLocalMeals(userId);
-      await reloadDay();
-    }
-
-    sync();
+    // Sin funcion anidada a proposito: una declaracion de funcion se eleva,
+    // y entonces TypeScript deja de saber que userId ya no puede estar vacio.
+    void migrateLocalMeals(userId).then(() => reloadDay());
   }, [session, reloadDay]);
 
   // Al volver a la app desde segundo plano: renueva el token y recarga el dia.
