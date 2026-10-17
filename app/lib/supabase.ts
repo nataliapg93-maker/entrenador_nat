@@ -261,3 +261,73 @@ export async function restFetch(path: string, init: RestOptions = {}) {
     return null;
   }
 }
+
+// --- Fotos de comida --------------------------------------------------
+// El almacen es privado. Se sube con la sesion de la usuaria, y para
+// mostrarlas hay que pedir enlaces firmados con caducidad.
+
+export async function uploadFile(bucket: string, path: string, file: File) {
+  const session = await ensureSession();
+
+  if (!session) {
+    throw new Error("Sesion caducada. Recarga la pagina.");
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      authorization: `Bearer ${session.access_token}`,
+      "content-type": file.type || "application/octet-stream",
+      "x-upsert": "true"
+    },
+    body: file
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(details || `Error ${response.status} al subir la foto.`);
+  }
+}
+
+export async function signPaths(
+  bucket: string,
+  paths: string[],
+  expiresIn = 60 * 60
+): Promise<Record<string, string>> {
+  if (paths.length === 0) {
+    return {};
+  }
+
+  const session = await ensureSession();
+
+  if (!session) {
+    return {};
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/sign/${bucket}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      apikey: SUPABASE_KEY,
+      authorization: `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({ expiresIn, paths })
+  }).catch(() => null);
+
+  if (!response || !response.ok) {
+    // Sin foto se sigue viendo la comida. No vale la pena romper la pantalla.
+    return {};
+  }
+
+  const rows = (await response.json()) as Array<{ path?: string; signedURL?: string }>;
+  const map: Record<string, string> = {};
+
+  for (const row of rows) {
+    if (row.path && row.signedURL) {
+      map[row.path] = `${SUPABASE_URL}/storage/v1${row.signedURL}`;
+    }
+  }
+
+  return map;
+}

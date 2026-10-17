@@ -18,6 +18,7 @@ import {
   fetchTargets,
   insertMeal,
   migrateLocalMeals,
+  uploadMealPhoto,
   type FoodAnalysis,
   type FoodIngredient,
   type MealEntry,
@@ -227,6 +228,7 @@ export default function NataliaApp() {
   const [foodLoading, setFoodLoading] = useState(false);
   const [foodError, setFoodError] = useState("");
   const [foodPhotoPreview, setFoodPhotoPreview] = useState<string | null>(null);
+  const [foodPhotoFile, setFoodPhotoFile] = useState<File | null>(null);
   const [savedMeals, setSavedMeals] = useState<MealEntry[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
@@ -433,6 +435,8 @@ export default function NataliaApp() {
     try {
       const file = await prepareImage(original);
       setFoodPhotoPreview(URL.createObjectURL(file));
+      // Se guarda para subirla al almacen cuando confirme la comida.
+      setFoodPhotoFile(file);
 
       const formData = new FormData();
       formData.set("photo", file);
@@ -509,13 +513,26 @@ export default function NataliaApp() {
     setDataError("");
 
     try {
-      await insertMeal(session.user.id, foodAnalysis);
+      let photoPath: string | undefined;
+
+      if (foodPhotoFile) {
+        try {
+          photoPath = await uploadMealPhoto(session.user.id, foodPhotoFile);
+        } catch {
+          // Si la foto no sube, la comida se guarda igual. Perder los
+          // macros por no poder guardar una imagen seria mucho peor.
+          photoPath = undefined;
+        }
+      }
+
+      await insertMeal(session.user.id, foodAnalysis, new Date(), photoPath);
       // La comida se guarda con la hora actual, asi que nos situamos en ese
       // dia antes de recargar. Si no, se guardaria y no se veria.
       setSelectedDay(new Date());
       await reloadDay();
       setFoodAnalysis(null);
       setFoodPhotoPreview(null);
+      setFoodPhotoFile(null);
       setActiveTab("hoy");
     } catch (problem) {
       setDataError(
@@ -726,6 +743,9 @@ export default function NataliaApp() {
               <div className="saved-meals">
                 {savedMeals.slice(0, 12).map((meal) => (
                   <div className="saved-meal" key={meal.id}>
+                    {meal.photoUrl && (
+                      <img className="meal-thumb" src={meal.photoUrl} alt={meal.mealName} />
+                    )}
                     <span>
                       <strong>{meal.mealName}</strong>
                       <small>{new Date(meal.createdAt).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}</small>

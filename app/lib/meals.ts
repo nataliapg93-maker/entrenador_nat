@@ -1,6 +1,6 @@
 "use client";
 
-import { restFetch } from "./supabase";
+import { restFetch, signPaths, uploadFile } from "./supabase";
 
 export type FoodIngredient = {
   name: string;
@@ -24,7 +24,11 @@ export type FoodAnalysis = {
 export type MealEntry = FoodAnalysis & {
   id: string;
   createdAt: string;
+  photoPath?: string;
+  photoUrl?: string;
 };
+
+export const MEAL_PHOTOS_BUCKET = "meal-photos";
 
 export type Targets = {
   kcal: number;
@@ -45,6 +49,7 @@ type MealRow = {
   protein: number;
   carbs: number;
   fat: number;
+  photo_path: string | null;
   meal_ingredients?: IngredientRow[];
 };
 
@@ -78,6 +83,7 @@ function rowToEntry(row: MealRow): MealEntry {
   return {
     id: row.id,
     createdAt: row.eaten_at,
+    photoPath: row.photo_path || undefined,
     mealName: row.name,
     notes: row.notes || "",
     confidence: Number(row.confidence ?? 1),
@@ -122,20 +128,37 @@ export async function fetchTargets(): Promise<Targets> {
 export async function fetchMealsForDay(reference: Date = new Date()): Promise<MealEntry[]> {
   const { start, end } = dayBounds(reference);
   const query = [
-    "meals?select=id,eaten_at,name,notes,confidence,kcal,protein,carbs,fat,meal_ingredients(*)",
+    "meals?select=id,eaten_at,name,notes,confidence,kcal,protein,carbs,fat,photo_path,meal_ingredients(*)",
     `eaten_at=gte.${start.toISOString()}`,
     `eaten_at=lt.${end.toISOString()}`,
     "order=eaten_at.desc"
   ].join("&");
 
   const rows = (await restFetch(query)) as MealRow[] | null;
-  return (rows || []).map(rowToEntry);
+  const meals = (rows || []).map(rowToEntry);
+
+  // El almacen es privado: hay que pedir un enlace temporal por cada foto.
+  const paths = meals.map((meal) => meal.photoPath).filter((path): path is string => Boolean(path));
+  const links = await signPaths(MEAL_PHOTOS_BUCKET, paths);
+
+  return meals.map((meal) =>
+    meal.photoPath && links[meal.photoPath] ? { ...meal, photoUrl: links[meal.photoPath] } : meal
+  );
+}
+
+// Sube la foto a la carpeta de la usuaria. Las reglas del almacen exigen
+// que el primer tramo de la ruta sea su identificador.
+export async function uploadMealPhoto(userId: string, file: File): Promise<string> {
+  const path = `${userId}/${crypto.randomUUID()}.jpg`;
+  await uploadFile(MEAL_PHOTOS_BUCKET, path, file);
+  return path;
 }
 
 export async function insertMeal(
   userId: string,
   analysis: FoodAnalysis,
-  eatenAt: Date = new Date()
+  eatenAt: Date = new Date(),
+  photoPath?: string
 ): Promise<MealEntry> {
   const inserted = (await restFetch("meals", {
     method: "POST",
@@ -150,6 +173,7 @@ export async function insertMeal(
       protein: analysis.totals.protein,
       carbs: analysis.totals.carbs,
       fat: analysis.totals.fat,
+      photo_path: photoPath || null,
       source: "foto"
     })
   })) as MealRow[];
@@ -176,7 +200,7 @@ export async function insertMeal(
     });
   }
 
-  return { ...analysis, id: meal.id, createdAt: meal.eaten_at };
+  return { ...analysis, id: meal.id, createdAt: meal.eaten_at, photoPath };
 }
 
 export async function deleteMeal(id: string) {

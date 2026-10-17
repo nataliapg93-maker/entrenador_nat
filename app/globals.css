@@ -751,3 +751,24 @@ button {
   opacity: 0.35;
   cursor: default;
 }
+
+/* Miniatura de la foto junto a cada comida guardada. */
+.meal-thumb {
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.saved-meal span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.saved-meal strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
