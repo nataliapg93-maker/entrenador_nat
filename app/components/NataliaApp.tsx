@@ -564,7 +564,24 @@ export default function NataliaApp() {
               <div className="camera-preview">
                 {foodPhotoPreview && <img className="meal-preview" src={foodPhotoPreview} alt="Comida fotografiada" />}
                 <div className="camera-grid" />
-                <label className="shutter" aria-label="Hacer foto con la camara">
+                <label className="camera-tap" aria-label="Hacer foto con la camara">
+                  <input
+                    accept="image/*"
+                    capture="environment"
+                    type="file"
+                    onChange={(event) => {
+                      const picked = event.target.files?.[0] || null;
+                      event.target.value = "";
+                      analyzeFoodPhoto(picked);
+                    }}
+                  />
+                  <span className="shutter-dot" />
+                </label>
+              </div>
+
+              <div className="photo-actions">
+                <label className="photo-button primary-photo">
+                  Hacer foto
                   <input
                     accept="image/*"
                     capture="environment"
@@ -576,20 +593,20 @@ export default function NataliaApp() {
                     }}
                   />
                 </label>
-              </div>
 
-              <label className="gallery-button">
-                Subir foto de la galeria
-                <input
-                  accept="image/*"
-                  type="file"
-                  onChange={(event) => {
-                    const picked = event.target.files?.[0] || null;
-                    event.target.value = "";
-                    analyzeFoodPhoto(picked);
-                  }}
-                />
-              </label>
+                <label className="photo-button">
+                  Galeria
+                  <input
+                    accept="image/*"
+                    type="file"
+                    onChange={(event) => {
+                      const picked = event.target.files?.[0] || null;
+                      event.target.value = "";
+                      analyzeFoodPhoto(picked);
+                    }}
+                  />
+                </label>
+              </div>
               <div>
                 <h2>Comida nueva</h2>
                 <p>{foodLoading ? "Analizando foto..." : "Foto, estimacion IA y correccion ingrediente por ingrediente."}</p>
@@ -616,7 +633,7 @@ export default function NataliaApp() {
                 <FoodEditRow
                   ingredient={ingredient}
                   index={index}
-                  key={`${ingredient.name}-${index}`}
+                  key={index}
                   onUpdate={updateIngredient}
                 />
               ))}

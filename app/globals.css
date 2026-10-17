@@ -648,12 +648,19 @@ button {
   }
 }
 
-/* Boton para elegir una foto ya hecha. El disparador redondo de arriba
-   abre la camara; este abre la galeria del movil. */
-.gallery-button {
-  display: block;
+/* Dos botones de verdad para la foto. Antes el disparador era un campo
+   invisible encima de un dibujo, y si el toque no caia justo encima no
+   pasaba nada. */
+.photo-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin: 14px 18px 0;
-  padding: 14px 18px;
+}
+
+.photo-button {
+  display: block;
+  padding: 16px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--pink-soft);
@@ -661,13 +668,49 @@ button {
   font-weight: 900;
   text-align: center;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.gallery-button:active {
+.photo-button.primary-photo {
   background: var(--pink);
+  border-color: var(--pink);
   color: var(--white);
 }
 
-.gallery-button input {
+.photo-button:active {
+  opacity: 0.7;
+}
+
+.photo-button input {
   display: none;
+}
+
+/* Toda la vista previa abre la camara, no solo el circulo blanco.
+   El circulo queda como pista visual, pero ya no es el unico blanco. */
+.camera-tap {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.camera-tap input {
+  display: none;
+}
+
+.shutter-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  width: 82px;
+  height: 82px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.23);
+  pointer-events: none;
+}
+
+.camera-tap:active .shutter-dot {
+  transform: translateX(-50%) scale(0.92);
 }
