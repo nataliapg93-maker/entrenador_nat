@@ -54,7 +54,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const formData = await request.formData();
+  // Si el cuerpo no es un formulario, formData() lanza y la funcion
+  // moria con un 500 vacio, sin explicar nada.
+  const formData = await request.formData().catch(() => null);
+
+  if (!formData) {
+    return NextResponse.json(
+      { error: "La peticion no traia una foto en el formato esperado." },
+      { status: 400 }
+    );
+  }
+
   const file = formData.get("photo");
 
   if (!(file instanceof File)) {
