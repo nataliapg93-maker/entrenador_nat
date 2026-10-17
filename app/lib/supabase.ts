@@ -104,16 +104,14 @@ export function captureSessionFromUrl(): Session | null {
 }
 
 async function refreshSession(session: Session): Promise<Session | null> {
-  let response: Response;
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: { "content-type": "application/json", apikey: SUPABASE_KEY },
+    body: JSON.stringify({ refresh_token: session.refresh_token })
+  }).catch(() => null);
 
-  try {
-    response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method: "POST",
-      headers: { "content-type": "application/json", apikey: SUPABASE_KEY },
-      body: JSON.stringify({ refresh_token: session.refresh_token })
-    });
-  } catch {
-    // Sin cobertura o servidor caido. No cerramos la sesion por esto.
+  // Sin cobertura o servidor caido. No cerramos la sesion por esto.
+  if (!response) {
     return session;
   }
 
@@ -177,7 +175,13 @@ export function signOut() {
 
 // --- Acceso a datos ------------------------------------------------
 
-export async function restFetch(path: string, init: RequestInit = {}) {
+type RestOptions = {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+};
+
+export async function restFetch(path: string, init: RestOptions = {}) {
   const session = await ensureSession();
 
   if (!session) {
@@ -185,7 +189,8 @@ export async function restFetch(path: string, init: RequestInit = {}) {
   }
 
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...init,
+    method: init.method || "GET",
+    body: init.body,
     headers: {
       "content-type": "application/json",
       apikey: SUPABASE_KEY,
