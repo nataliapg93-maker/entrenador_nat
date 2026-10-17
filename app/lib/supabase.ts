@@ -77,6 +77,41 @@ export async function sendMagicLink(email: string) {
   }
 }
 
+// Entra sin email ni contrasena. Supabase crea un usuario anonimo real,
+// asi que las reglas de seguridad por fila siguen aplicando igual.
+export async function signInAnonymously(): Promise<Session> {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", apikey: SUPABASE_KEY },
+    body: JSON.stringify({})
+  }).catch(() => null);
+
+  if (!response) {
+    throw new Error("Sin conexion con la base de datos. Revisa tu cobertura.");
+  }
+
+  if (!response.ok) {
+    const details = await response.text();
+
+    if (details.includes("anonymous_provider_disabled")) {
+      throw new Error(
+        "Falta activar el acceso anonimo en Supabase: Authentication, Sign In / Providers, Anonymous sign-ins."
+      );
+    }
+
+    throw new Error(`No se ha podido abrir la sesion: ${details}`);
+  }
+
+  const session = normalizeSession(await response.json());
+
+  if (!session.access_token) {
+    throw new Error("Supabase no ha devuelto una sesion valida.");
+  }
+
+  writeSession(session);
+  return session;
+}
+
 // Lee los tokens que Supabase deja en el fragmento de la URL al volver del email.
 export function captureSessionFromUrl(): Session | null {
   if (typeof window === "undefined" || !window.location.hash) {

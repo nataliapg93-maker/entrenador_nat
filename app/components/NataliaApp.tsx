@@ -8,7 +8,7 @@ import {
   ensureSession,
   isConfigured,
   loadUser,
-  signOut,
+  signInAnonymously,
   type Session
 } from "../lib/supabase";
 import {
@@ -229,6 +229,7 @@ export default function NataliaApp() {
   const [savedMeals, setSavedMeals] = useState<MealEntry[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [authError, setAuthError] = useState("");
   const [targets, setTargets] = useState<Targets>(defaultTargets);
   const [dataError, setDataError] = useState("");
   const [savingMeal, setSavingMeal] = useState(false);
@@ -259,17 +260,38 @@ export default function NataliaApp() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function restore() {
       try {
         captureSessionFromUrl();
-        const active = await ensureSession();
-        setSession(active ? await loadUser(active) : null);
+        // Si ya hay sesion guardada se reutiliza. Si no, se crea una anonima.
+        // La usuaria no ve ninguna pantalla de acceso.
+        const restored = await ensureSession();
+        const active = restored ?? (await signInAnonymously());
+        const withUser = await loadUser(active);
+
+        if (!cancelled) {
+          setSession(withUser);
+        }
+      } catch (problem) {
+        if (!cancelled) {
+          setAuthError(
+            problem instanceof Error ? problem.message : "No se ha podido abrir la sesion."
+          );
+        }
       } finally {
-        setAuthReady(true);
+        if (!cancelled) {
+          setAuthReady(true);
+        }
       }
     }
 
     restore();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const reloadDay = useCallback(async () => {
@@ -436,7 +458,7 @@ export default function NataliaApp() {
   }
 
   if (!session) {
-    return <AuthGate configured={isConfigured()} />;
+    return <AuthGate configured={isConfigured()} error={authError} />;
   }
 
   return (
@@ -461,17 +483,6 @@ export default function NataliaApp() {
           </div>
           <button className="home-button" onClick={() => setActiveTab("hoy")} aria-label="Ir al inicio">
             Casa
-          </button>
-          <button
-            className="home-button"
-            onClick={() => {
-              signOut();
-              setSession(null);
-              setSavedMeals([]);
-            }}
-            aria-label="Cerrar sesion"
-          >
-            Salir
           </button>
         </section>
 
