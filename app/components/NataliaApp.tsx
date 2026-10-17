@@ -346,16 +346,55 @@ export default function NataliaApp() {
     return { minutes, calories, bike, other };
   }, [activities]);
 
-  async function analyzeFoodPhoto(file: File | null) {
-    if (!file) {
+  // Las fotos del movil suelen venir en HEIC y pesar varios megas.
+  // Se reescalan y se convierten a JPG en el propio telefono: asi el
+  // formato siempre es valido y la subida es mucho mas rapida.
+  async function prepareImage(original: File): Promise<File> {
+    try {
+      const bitmap = await createImageBitmap(original);
+      const maxSide = 1280;
+      const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+      const width = Math.round(bitmap.width * scale);
+      const height = Math.round(bitmap.height * scale);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const context = canvas.getContext("2d");
+      if (!context) {
+        return original;
+      }
+
+      context.drawImage(bitmap, 0, 0, width, height);
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((result) => resolve(result), "image/jpeg", 0.85);
+      });
+
+      if (!blob) {
+        return original;
+      }
+
+      return new File([blob], "comida.jpg", { type: "image/jpeg" });
+    } catch {
+      // Si el navegador no sabe abrir la imagen, se envia tal cual.
+      return original;
+    }
+  }
+
+  async function analyzeFoodPhoto(original: File | null) {
+    if (!original) {
       return;
     }
 
     setFoodLoading(true);
     setFoodError("");
-    setFoodPhotoPreview(URL.createObjectURL(file));
 
     try {
+      const file = await prepareImage(original);
+      setFoodPhotoPreview(URL.createObjectURL(file));
+
       const formData = new FormData();
       formData.set("photo", file);
       const response = await fetch("/api/food/analyze", {
@@ -525,15 +564,32 @@ export default function NataliaApp() {
               <div className="camera-preview">
                 {foodPhotoPreview && <img className="meal-preview" src={foodPhotoPreview} alt="Comida fotografiada" />}
                 <div className="camera-grid" />
-                <label className="shutter" aria-label="Hacer foto">
+                <label className="shutter" aria-label="Hacer foto con la camara">
                   <input
                     accept="image/*"
                     capture="environment"
                     type="file"
-                    onChange={(event) => analyzeFoodPhoto(event.target.files?.[0] || null)}
+                    onChange={(event) => {
+                      const picked = event.target.files?.[0] || null;
+                      event.target.value = "";
+                      analyzeFoodPhoto(picked);
+                    }}
                   />
                 </label>
               </div>
+
+              <label className="gallery-button">
+                Subir foto de la galeria
+                <input
+                  accept="image/*"
+                  type="file"
+                  onChange={(event) => {
+                    const picked = event.target.files?.[0] || null;
+                    event.target.value = "";
+                    analyzeFoodPhoto(picked);
+                  }}
+                />
+              </label>
               <div>
                 <h2>Comida nueva</h2>
                 <p>{foodLoading ? "Analizando foto..." : "Foto, estimacion IA y correccion ingrediente por ingrediente."}</p>
