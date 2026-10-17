@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Next.js
+.next/
+out/
+node_modules/
+
+# Vercel
+.vercel
+
+# Secretos locales
+.env
+.env.local
+.env.*.local
+
+# Copias viejas del prototipo de un solo archivo
+index.html.local-antiguo
+*.zip
