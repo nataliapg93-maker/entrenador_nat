@@ -7,6 +7,7 @@ import {
   captureSessionFromUrl,
   ensureSession,
   isConfigured,
+  isStorageWorking,
   loadUser,
   signInAnonymously,
   type Session
@@ -230,6 +231,8 @@ export default function NataliaApp() {
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [selectedDay, setSelectedDay] = useState(() => new Date());
+  const [storageOk, setStorageOk] = useState(true);
   const [targets, setTargets] = useState<Targets>(defaultTargets);
   const [dataError, setDataError] = useState("");
   const [savingMeal, setSavingMeal] = useState(false);
@@ -273,6 +276,7 @@ export default function NataliaApp() {
 
         if (!cancelled) {
           setSession(withUser);
+          setStorageOk(isStorageWorking());
         }
       } catch (problem) {
         if (!cancelled) {
@@ -296,7 +300,10 @@ export default function NataliaApp() {
 
   const reloadDay = useCallback(async () => {
     try {
-      const [dayMeals, dayTargets] = await Promise.all([fetchMealsForDay(), fetchTargets()]);
+      const [dayMeals, dayTargets] = await Promise.all([
+        fetchMealsForDay(selectedDay),
+        fetchTargets()
+      ]);
       setSavedMeals(dayMeals);
       setTargets(dayTargets);
       setDataError("");
@@ -305,7 +312,7 @@ export default function NataliaApp() {
         problem instanceof Error ? problem.message : "No se han podido cargar tus comidas."
       );
     }
-  }, []);
+  }, [selectedDay]);
 
   useEffect(() => {
     const userId = session?.user.id;
@@ -381,6 +388,38 @@ export default function NataliaApp() {
       // Si el navegador no sabe abrir la imagen, se envia tal cual.
       return original;
     }
+  }
+
+  const dayOffset = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const current = new Date(selectedDay);
+    current.setHours(0, 0, 0, 0);
+    return Math.round((current.getTime() - today.getTime()) / 86400000);
+  }, [selectedDay]);
+
+  const dayLabel = useMemo(() => {
+    if (dayOffset === 0) {
+      return "Hoy";
+    }
+
+    if (dayOffset === -1) {
+      return "Ayer";
+    }
+
+    return new Intl.DateTimeFormat("es", {
+      weekday: "long",
+      day: "numeric",
+      month: "short"
+    }).format(selectedDay);
+  }, [dayOffset, selectedDay]);
+
+  function shiftDay(days: number) {
+    setSelectedDay((current) => {
+      const next = new Date(current);
+      next.setDate(next.getDate() + days);
+      return next;
+    });
   }
 
   async function analyzeFoodPhoto(original: File | null) {
@@ -471,6 +510,9 @@ export default function NataliaApp() {
 
     try {
       await insertMeal(session.user.id, foodAnalysis);
+      // La comida se guarda con la hora actual, asi que nos situamos en ese
+      // dia antes de recargar. Si no, se guardaria y no se veria.
+      setSelectedDay(new Date());
       await reloadDay();
       setFoodAnalysis(null);
       setFoodPhotoPreview(null);
@@ -515,7 +557,7 @@ export default function NataliaApp() {
         <section className="hero">
           <div>
             <p className="eyebrow">Natalia Fit</p>
-            <h1>Hoy</h1>
+            <h1>{dayLabel}</h1>
             <p>
               {targets.kcal} kcal · {targets.protein}P · {targets.carbs}C · {targets.fat}G
             </p>
@@ -527,6 +569,29 @@ export default function NataliaApp() {
 
         {activeTab === "hoy" && (
           <section className="screen">
+            {!storageOk && (
+              <article className="card feedback">
+                Tu navegador no esta guardando la sesion, asi que cada vez que abras la app
+                apareceras como usuaria nueva y no veras lo anterior. Suele pasar en
+                navegacion privada: abrela en una ventana normal.
+              </article>
+            )}
+
+            <div className="day-nav">
+              <button type="button" onClick={() => shiftDay(-1)} aria-label="Dia anterior">
+                ‹
+              </button>
+              <strong>{dayLabel}</strong>
+              <button
+                type="button"
+                onClick={() => shiftDay(1)}
+                disabled={dayOffset >= 0}
+                aria-label="Dia siguiente"
+              >
+                ›
+              </button>
+            </div>
+
             <div className="summary-card gradient-card">
               <div>
                 <span className="label">Consumidas</span>
@@ -650,12 +715,16 @@ export default function NataliaApp() {
             </article>
 
             <article className="analysis-card">
-              <p className="eyebrow">Hoy</p>
+              <p className="eyebrow">{dayLabel}</p>
               <h3>Comidas guardadas</h3>
               {dataError && <p className="error-text">{dataError}</p>}
-              {savedMeals.length === 0 && <p className="muted">Todavia no hay comidas guardadas hoy.</p>}
+              {savedMeals.length === 0 && (
+                <p className="muted">
+                  Sin comidas guardadas este dia. Usa las flechas para ver otros dias.
+                </p>
+              )}
               <div className="saved-meals">
-                {savedMeals.slice(0, 4).map((meal) => (
+                {savedMeals.slice(0, 12).map((meal) => (
                   <div className="saved-meal" key={meal.id}>
                     <span>
                       <strong>{meal.mealName}</strong>

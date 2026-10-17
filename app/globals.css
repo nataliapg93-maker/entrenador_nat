@@ -714,3 +714,40 @@ button {
 .camera-tap:active .shutter-dot {
   transform: translateX(-50%) scale(0.92);
 }
+
+/* Navegacion entre dias. Sin esto, una comida guardada de madrugada
+   parecia perdida al pasar la medianoche. */
+.day-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.day-nav strong {
+  font-size: 15px;
+  color: var(--purple-deep);
+  text-transform: capitalize;
+}
+
+.day-nav button {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--pink-soft);
+  color: var(--purple-deep);
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.day-nav button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}

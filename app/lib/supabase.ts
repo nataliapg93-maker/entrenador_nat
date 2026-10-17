@@ -32,6 +32,14 @@ export function readSession(): Session | null {
   }
 }
 
+// Si el movil no guarda la sesion, cada visita crearia un usuario nuevo
+// y el historial anterior quedaria invisible. Mejor detectarlo y avisar.
+let storageWorks = true;
+
+export function isStorageWorking() {
+  return storageWorks;
+}
+
 function writeSession(session: Session | null) {
   if (typeof window === "undefined") {
     return;
@@ -40,11 +48,13 @@ function writeSession(session: Session | null) {
   try {
     if (session) {
       window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      storageWorks = Boolean(window.localStorage.getItem(SESSION_KEY));
     } else {
       window.localStorage.removeItem(SESSION_KEY);
     }
   } catch {
-    // Navegador en modo privado o almacenamiento bloqueado. Seguimos sin persistir.
+    // Navegacion privada o almacenamiento bloqueado.
+    storageWorks = false;
   }
 }
 
