@@ -1,7 +1,27 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import AuthGate from "./AuthGate";
+import {
+  captureSessionFromUrl,
+  ensureSession,
+  isConfigured,
+  loadUser,
+  signOut,
+  type Session
+} from "../lib/supabase";
+import {
+  defaultTargets,
+  fetchMealsForDay,
+  fetchTargets,
+  insertMeal,
+  migrateLocalMeals,
+  type FoodAnalysis,
+  type FoodIngredient,
+  type MealEntry,
+  type Targets
+} from "../lib/meals";
 
 type StravaStatus = {
   connected: boolean;
@@ -33,42 +53,6 @@ type Exercise = {
   image: string;
   description: string;
   tips: [string, string];
-};
-
-type FoodIngredient = {
-  name: string;
-  grams: number;
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  confidence: number;
-  reason: string;
-};
-
-type FoodAnalysis = {
-  mealName: string;
-  confidence: number;
-  notes: string;
-  totals: {
-    kcal: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
-  ingredients: FoodIngredient[];
-};
-
-type MealEntry = FoodAnalysis & {
-  id: string;
-  createdAt: string;
-};
-
-const targets = {
-  kcal: 1537,
-  protein: 141,
-  carbs: 147,
-  fat: 43
 };
 
 const exercises: Exercise[] = [
@@ -243,6 +227,11 @@ export default function NataliaApp() {
   const [foodError, setFoodError] = useState("");
   const [foodPhotoPreview, setFoodPhotoPreview] = useState<string | null>(null);
   const [savedMeals, setSavedMeals] = useState<MealEntry[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [targets, setTargets] = useState<Targets>(defaultTargets);
+  const [dataError, setDataError] = useState("");
+  const [savingMeal, setSavingMeal] = useState(false);
 
   useEffect(() => {
     async function loadStrava() {
@@ -258,6 +247,9 @@ export default function NataliaApp() {
             setActivities(activityData.activities || []);
           }
         }
+      } catch {
+        // Strava aun no esta configurado. La app sigue funcionando sin el.
+        setStatus({ connected: false });
       } finally {
         setLoadingStrava(false);
       }
@@ -267,11 +259,63 @@ export default function NataliaApp() {
   }, []);
 
   useEffect(() => {
-    const storedMeals = window.localStorage.getItem("natalia-fit-meals");
-    if (storedMeals) {
-      setSavedMeals(JSON.parse(storedMeals) as MealEntry[]);
+    async function restore() {
+      try {
+        captureSessionFromUrl();
+        const active = await ensureSession();
+        setSession(active ? await loadUser(active) : null);
+      } finally {
+        setAuthReady(true);
+      }
+    }
+
+    restore();
+  }, []);
+
+  const reloadDay = useCallback(async () => {
+    try {
+      const [dayMeals, dayTargets] = await Promise.all([fetchMealsForDay(), fetchTargets()]);
+      setSavedMeals(dayMeals);
+      setTargets(dayTargets);
+      setDataError("");
+    } catch (problem) {
+      setDataError(
+        problem instanceof Error ? problem.message : "No se han podido cargar tus comidas."
+      );
     }
   }, []);
+
+  useEffect(() => {
+    const userId = session?.user.id;
+
+    if (!userId) {
+      return;
+    }
+
+    async function sync() {
+      await migrateLocalMeals(userId);
+      await reloadDay();
+    }
+
+    sync();
+  }, [session, reloadDay]);
+
+  // Al volver a la app desde segundo plano: renueva el token y recarga el dia.
+  // Asi de madrugada el contador pasa a cero solo, sin tener que cerrar nada.
+  useEffect(() => {
+    if (!session?.user.id) {
+      return;
+    }
+
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        reloadDay();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [session, reloadDay]);
 
   const dailyTotals = useMemo(() => calculateMealEntryTotals(savedMeals), [savedMeals]);
 
@@ -359,25 +403,43 @@ export default function NataliaApp() {
     });
   }
 
-  function saveMeal() {
-    if (!foodAnalysis) {
+  async function saveMeal() {
+    if (!foodAnalysis || !session?.user.id) {
       return;
     }
 
-    const nextMeals = [
-      {
-        ...foodAnalysis,
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString()
-      },
-      ...savedMeals
-    ];
+    setSavingMeal(true);
+    setDataError("");
 
-    setSavedMeals(nextMeals);
-    window.localStorage.setItem("natalia-fit-meals", JSON.stringify(nextMeals));
-    setFoodAnalysis(null);
-    setFoodPhotoPreview(null);
-    setActiveTab("hoy");
+    try {
+      await insertMeal(session.user.id, foodAnalysis);
+      await reloadDay();
+      setFoodAnalysis(null);
+      setFoodPhotoPreview(null);
+      setActiveTab("hoy");
+    } catch (problem) {
+      setDataError(
+        problem instanceof Error ? problem.message : "No se ha podido guardar la comida."
+      );
+    } finally {
+      setSavingMeal(false);
+    }
+  }
+
+  if (!authReady) {
+    return (
+      <main className="app-shell">
+        <section className="phone">
+          <section className="screen">
+            <p className="muted">Cargando...</p>
+          </section>
+        </section>
+      </main>
+    );
+  }
+
+  if (!session) {
+    return <AuthGate configured={isConfigured()} />;
   }
 
   return (
@@ -396,10 +458,23 @@ export default function NataliaApp() {
           <div>
             <p className="eyebrow">Natalia Fit</p>
             <h1>Hoy</h1>
-            <p>1537 kcal · 141P · 147C · 43G</p>
+            <p>
+              {targets.kcal} kcal · {targets.protein}P · {targets.carbs}C · {targets.fat}G
+            </p>
           </div>
           <button className="home-button" onClick={() => setActiveTab("hoy")} aria-label="Ir al inicio">
             Casa
+          </button>
+          <button
+            className="home-button"
+            onClick={() => {
+              signOut();
+              setSession(null);
+              setSavedMeals([]);
+            }}
+            aria-label="Cerrar sesion"
+          >
+            Salir
           </button>
         </section>
 
@@ -487,8 +562,8 @@ export default function NataliaApp() {
               </button>
 
               {foodAnalysis && (
-                <button className="primary-action" onClick={saveMeal}>
-                  Guardar comida
+                <button className="primary-action" onClick={saveMeal} disabled={savingMeal}>
+                  {savingMeal ? "Guardando..." : "Guardar comida"}
                 </button>
               )}
             </article>
@@ -496,6 +571,7 @@ export default function NataliaApp() {
             <article className="analysis-card">
               <p className="eyebrow">Hoy</p>
               <h3>Comidas guardadas</h3>
+              {dataError && <p className="error-text">{dataError}</p>}
               {savedMeals.length === 0 && <p className="muted">Todavia no hay comidas guardadas hoy.</p>}
               <div className="saved-meals">
                 {savedMeals.slice(0, 4).map((meal) => (

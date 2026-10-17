@@ -3,7 +3,17 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Natalia Fit",
-  description: "Nutricion, fuerza y actividad conectada con Strava."
+  description: "Nutricion, fuerza y actividad conectada con Strava.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png"
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Natalia Fit",
+    statusBarStyle: "default"
+  }
 };
 
 export const viewport: Viewport = {
